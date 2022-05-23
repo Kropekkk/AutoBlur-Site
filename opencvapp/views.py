@@ -1,8 +1,11 @@
 from django.shortcuts import render
-from .forms import UploadImageForm, ImageUploadForm
-from django.core.files.storage import FileSystemStorage
+from .forms import ImageUploadForm
 from django.conf import settings
 from .blur import blur
+
+def main(request):
+    return render(request, "opencvapp/main.html", {
+    })
 
 def blurface(request):
   form = ImageUploadForm(request.POST, request.FILES)
@@ -10,9 +13,10 @@ def blurface(request):
      if form.is_valid():
         post = form.save(commit=False)
         post.save()
- 
+        
+        sliderInfo = form.instance.slider
         imageURL = settings.MEDIA_URL + form.instance.document.name
-        blur(settings.MEDIA_ROOT_URL + imageURL)
+        blur(settings.MEDIA_ROOT_URL + imageURL, sliderInfo)
  
         return render(request, 'opencvapp/blurface.html', {'form':form, 'post':post})
   else:
